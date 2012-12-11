@@ -1,0 +1,7 @@
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\bin\Release\SessionMapper.exe
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\bin\Release\SessionMapper.pdb
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\obj\x86\Release\SessionMapper.Form1.resources
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\obj\x86\Release\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\obj\x86\Release\SessionMapper.csproj.GenerateResource.Cache
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\obj\x86\Release\SessionMapper.exe
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\obj\x86\Release\SessionMapper.pdb
