@@ -37,6 +37,7 @@
             this.rrtb = new System.Windows.Forms.RichTextBox();
             this.tip = new System.Windows.Forms.TextBox();
             this.gmap = new GMap.NET.WindowsForms.GMapControl();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
             // bstart
@@ -130,6 +131,11 @@
             this.gmap.Size = new System.Drawing.Size(1044, 635);
             this.gmap.TabIndex = 6;
             this.gmap.Zoom = 0D;
+            this.gmap.Load += new System.EventHandler(this.gmap_Load);
+            // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
             // 
             // Form1
             // 
@@ -166,6 +172,7 @@
         private System.Windows.Forms.RichTextBox rrtb;
         private System.Windows.Forms.TextBox tip;
         private GMap.NET.WindowsForms.GMapControl gmap;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 
