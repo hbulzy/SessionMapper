@@ -9,21 +9,32 @@ using System.Text;
 using System.Windows.Forms;
 using System.Net;
 using System.Net.NetworkInformation;
-
+using GMap.NET;
+using GMap.NET.MapProviders;
+using GMap.NET.WindowsForms;
+using GMap.NET.WindowsForms.Markers;
+using GMap.NET.WindowsForms.ToolTips;
 
 
 namespace SessionMapper
 {
     public partial class Form1 : Form
     {
-
+        
         const string Version = "1.0";
         const string Title = "Session Map v" + Version;
         string nl = Environment.NewLine;
         bool running = false;
         const string StopMessage = "Stop Displaying Sessions";
         const string StartMessage = "Start Displaying Sessions";
-        ArrayList mappoints;
+        ArrayList mappoints = new ArrayList();
+        string myIP;
+        point myIPpt = new point(0,0);
+
+       
+        GMapOverlay remotes;
+       
+        GMapOverlay Self;
         public Form1()
         {
             InitializeComponent();
@@ -31,14 +42,34 @@ namespace SessionMapper
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            tip.Text = "8.8.8.8";
             bstart.Text = StartMessage;
             this.Text = Title;
+            updatemyip();
+            
         }
-
+        private void updatemyip() 
+        {
+            // get current ip
+            WebClient client1 = new WebClient();
+            string eResult1 = client1.DownloadString("http://www.icanhazip.com").ToString();
+            myIP = eResult1;
+            location temp1 = GetLocation(myIP);
+            myIPpt.latitude = temp1.latitude;
+            myIPpt.longitude = temp1.longitude;
+            //red
+            GMapOverlay Self = new GMapOverlay(gmap, "Self");
+            GMapMarker selfmark = new GMapMarkerGoogleRed(new PointLatLng(myIPpt.latitude, myIPpt.longitude));
+            selfmark.ToolTipMode = MarkerTooltipMode.Always;
+            selfmark.ToolTipText = "Local";
+            Self.Markers.Add(selfmark);
+            gmap.Overlays.Add(Self);
+        }
         private void bstart_Click(object sender, EventArgs e)
         {
             if (running == false)
             {
+                updatemyip();
                 running = true;
                 bstart.Text = StopMessage;
                 Record();
@@ -50,6 +81,25 @@ namespace SessionMapper
             }
 
         }
+        private void configmap() {
+         
+           // gmap.SetCurrentPositionByKeywords("United States");
+            gmap.MinZoom = 1;
+            gmap.MaxZoom = 17;
+            gmap.Zoom = 1;
+            gmap.MapProvider = GMapProviders.GoogleMap;
+            gmap.Manager.Mode = AccessMode.ServerOnly;
+            GMapProvider.WebProxy = null;
+            gmap.Position = new PointLatLng(0, 0);
+       
+            Size siz = new System.Drawing.Size(gmap.Width, gmap.Height);
+            gmap.ClientSize = siz;
+         
+
+       
+        
+        }
+
         private void ClearAll()
         {
 
@@ -88,6 +138,7 @@ namespace SessionMapper
             int maplist=0;
             Boolean mapable = false;
             point pt;
+            string toolstr="";
             foreach (TcpConnectionInformation info in tcpConnections)
             {
                 localip = info.LocalEndPoint.Address.ToString();
@@ -97,14 +148,19 @@ namespace SessionMapper
                 TcpState1 = info.State.ToString();
                 loc = GetLocation(remoteip);
                 mapable = loc.success;
+                rtb.AppendText("* " + localip + ":" + localport + " => " + remoteip + ":" + remoteport + nl + "    " + TcpState1 + " (" + mapable + "," + loc.longitude + "," + loc.latitude + ")");
                 if (mapable)
                 {
                     maplist+=1;
                     pt=new point(loc.latitude,loc.longitude);
                     mappoints.Add(pt);
+                    rtb.AppendText(" Point: " + maplist);
+                    toolstr = "Remote: " + maplist +nl + "(" +localip + ":" + localport + " => " + remoteip + ":" + remoteport + "  " + TcpState1+ ")";
+                    SetMarker(toolstr , loc.latitude, loc.longitude);
                 }
-                rtb.AppendText(localip + ":" + localport + " ==> " + remoteip + ":" + remoteport + "  " + TcpState1 + " (" + mapable + "," + loc.longitude + "," + loc.latitude + ")" + nl);
+                rtb.AppendText( nl);
                 tcpconnlist += 1;
+               
                 InvalidateAll();
 
             }
@@ -150,8 +206,22 @@ namespace SessionMapper
            tmp= GetLocation(ip);
             string strres = "(" + tmp.success + "," + tmp.latitude + "," + tmp.longitude + ")";
             rrtb.AppendText(strres);
+            SetMarker("TEST", tmp.latitude, tmp.longitude);
 
         }
+         public void SetMarker(string markertext, double lat1, double long1) 
+         {
+             //green
+             GMapMarker myCity = new GMapMarkerGoogleGreen(new PointLatLng(lat1, long1));
+             myCity.ToolTipMode = MarkerTooltipMode.Always;
+             myCity.ToolTipText = markertext;
+             remotes = new GMapOverlay(gmap, "remotes");
+             remotes.Markers.Add(myCity);
+             gmap.Overlays.Add(remotes);
+             gmap.Refresh();
+
+         }
+
         public location GetLocation(string strIP)
         {
             location temp1 = new location();
@@ -167,6 +237,8 @@ namespace SessionMapper
                temp1.success = true;
                temp1.latitude=Convert.ToDouble(splits[8]);
                temp1.longitude=Convert.ToDouble(splits[9]);
+             
+
             }
             catch
             {
@@ -176,13 +248,29 @@ namespace SessionMapper
            if (temp1.latitude == 0 && temp1.longitude == 0) { temp1.success = false; }
             return temp1;
         }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            configmap();
+        }
+
+        private void Form1_Click(object sender, EventArgs e)
+        {
+           
+         
+        }
+
+        private void rtb_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
     public class location
     {
         public bool success = false;
         public double latitude = 0;
         public double longitude = 0;
-    }
+            }
     public class point
     {
         public double latitude = 0;

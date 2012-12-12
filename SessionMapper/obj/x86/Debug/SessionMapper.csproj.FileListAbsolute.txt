@@ -5,3 +5,8 @@ C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\Session
 C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\obj\x86\Debug\SessionMapper.exe
 C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\obj\x86\Debug\SessionMapper.pdb
 C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\obj\x86\Debug\SessionMapper.Form1.resources
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\obj\x86\Debug\SessionMapper.csprojResolveAssemblyReference.cache
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\bin\Debug\GMap.NET.Core.dll
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\bin\Debug\GMap.NET.WindowsForms.dll
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\bin\Debug\GMap.NET.Core.xml
+C:\Users\kkhlebopros\Documents\Visual Studio 2010\Projects\SessionMapper\SessionMapper\bin\Debug\GMap.NET.WindowsForms.xml
