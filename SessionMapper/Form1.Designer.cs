@@ -60,9 +60,9 @@
             // 
             this.bb.Location = new System.Drawing.Point(220, 7);
             this.bb.Name = "bb";
-            this.bb.Size = new System.Drawing.Size(86, 23);
+            this.bb.Size = new System.Drawing.Size(141, 23);
             this.bb.TabIndex = 3;
-            this.bb.Text = "Get Location";
+            this.bb.Text = "Map One IP ==>";
             this.bb.UseVisualStyleBackColor = true;
             this.bb.Click += new System.EventHandler(this.bb_Click);
             // 
@@ -76,9 +76,9 @@
             // 
             // tip
             // 
-            this.tip.Location = new System.Drawing.Point(321, 10);
+            this.tip.Location = new System.Drawing.Point(367, 10);
             this.tip.Name = "tip";
-            this.tip.Size = new System.Drawing.Size(172, 20);
+            this.tip.Size = new System.Drawing.Size(126, 20);
             this.tip.TabIndex = 5;
             // 
             // gmap
@@ -124,6 +124,8 @@
             this.Controls.Add(this.bb);
             this.Controls.Add(this.lstats);
             this.Controls.Add(this.bstart);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);

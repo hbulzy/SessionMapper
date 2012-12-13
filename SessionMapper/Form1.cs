@@ -25,8 +25,8 @@ namespace SessionMapper
         const string Title = "Session Map v" + Version +" - " + UpdateDate + " - by: kossboss";
         string nl = Environment.NewLine;
        // bool running = false;
-        const string StopMessage = "Stop Displaying Sessions";
-        const string StartMessage = "Start Displaying Sessions";
+   //     const string StopMessage = "Stop Displaying Sessions";
+     //   const string StartMessage = "Start Displaying Sessions";
         string myIP;
         location myIPpt = new location();
         ArrayList locs;
@@ -81,20 +81,43 @@ namespace SessionMapper
             this.Text = Title;
             updatemyip();
         }
+        private bool checkinternet()
+        { 
+          //simple check via domain name of icanhazip
+            try
+            {
+                WebClient client1 = new WebClient();
+                string eResult1 = client1.DownloadString("http://www.icanhazip.com").ToString();
+                return true;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("No Internet Connection Detected. Fix your Internet Connection and make sure DNS is functioning good.");
+                return false;
+            }
+         }
         private void updatemyip()
         {
-            WebClient client1 = new WebClient();
-            string eResult1 = client1.DownloadString("http://www.icanhazip.com").ToString();
-            myIP = eResult1;
-            myIPpt.self = true;
-            myIPpt.localip = myIP;
-            myIPpt.UpdateLocation();
-            Self = new GMapOverlay(gmap, "Self");
-            GMapMarker selfmark = new GMapMarkerGoogleRed(new PointLatLng(myIPpt.latitude, myIPpt.longitude));
-            selfmark.ToolTipMode = MarkerTooltipMode.Always;
-            selfmark.ToolTipText = "Local: " + myIP;
-            Self.Markers.Add(selfmark);
-            gmap.Overlays.Add(Self);
+            try
+            {
+                WebClient client1 = new WebClient();
+                string eResult1 = client1.DownloadString("http://www.icanhazip.com").ToString();
+                myIP = eResult1;
+                myIPpt.self = true;
+                myIPpt.localip = myIP;
+                myIPpt.UpdateLocation();
+                Self = new GMapOverlay(gmap, "Self");
+                GMapMarker selfmark = new GMapMarkerGoogleRed(new PointLatLng(myIPpt.latitude, myIPpt.longitude));
+                selfmark.ToolTipMode = MarkerTooltipMode.Always;
+                selfmark.ToolTipText = "Local: " + myIP;
+                Self.Markers.Add(selfmark);
+                gmap.Overlays.Add(Self);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("No Internet Connection Detected. Fix your Internet Connection and make sure DNS is functioning good.");
+            }
+           
         }
         private void bstart_Click(object sender, EventArgs e)
         {
@@ -126,8 +149,11 @@ namespace SessionMapper
         }
         private void ClearAll()
         {
+           
+           
             lv.Clear();
             setuplv();
+           gmap.Overlays.Clear();
             rrtb.Clear();
         }
         private void InvalidateAll()
@@ -317,6 +343,7 @@ namespace SessionMapper
         }
         private void bb_Click(object sender, EventArgs e)
         {
+            if (checkinternet() == false) { return; }
             try
             {
                 string locbit;
