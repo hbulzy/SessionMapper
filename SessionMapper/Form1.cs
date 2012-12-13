@@ -21,58 +21,95 @@ namespace SessionMapper
     public partial class Form1 : Form
     {
         const string Version = "1.0";
-        const string Title = "Session Map v" + Version;
+        const string UpdateDate = "12/12/2012";
+        const string Title = "Session Map v" + Version +" - " + UpdateDate + " - by: kossboss";
         string nl = Environment.NewLine;
-        bool running = false;
+       // bool running = false;
         const string StopMessage = "Stop Displaying Sessions";
         const string StartMessage = "Start Displaying Sessions";
-        ArrayList mappoints = new ArrayList();
         string myIP;
-        point myIPpt = new point(0, 0);
+        location myIPpt = new location();
+        ArrayList locs;
         GMapOverlay remotes;
         GMapOverlay Self;
         public Form1()
         {
             InitializeComponent();
         }
+        public void setuplv() 
+        {
+            lv.View = View.Details;
+            lv.GridLines = true;
+            lv.FullRowSelect = true;
+            lv.Columns.Add("id",20);
+            lv.Columns.Add("Local IP",60);
+            lv.Columns.Add("Local Port", 70);
+            lv.Columns.Add("Remote IP", 70);
+            lv.Columns.Add("Remote Port", 80);
+            lv.Columns.Add("TCP State", 65);
+            lv.Columns.Add("TCP/UDP", 70);
+            lv.Columns.Add("Listener", 50);
+            lv.Columns.Add("Map Pt.", 50);
+            lv.Columns.Add("City", 40);
+            lv.Columns.Add("State", 40);
+            lv.Columns.Add("Country", 50);
+            lv.Columns.Add("Zip", 40);
+
+        }
+        public void working()
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            
+           
+            this.Text = Title + " - WORKING PLEASE WAIT";
+        }
+        public void doneworking()
+        {
+            Cursor.Current = Cursors.Default;
+          
+            
+            this.Text = Title;
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
+            working();
+            setuplv();
             tip.Text = "8.8.8.8";
-            bstart.Text = StartMessage;
+           // bstart.Text = StartMessage;
+            bstart.Text = "Gather Network Info";
             this.Text = Title;
             updatemyip();
         }
         private void updatemyip()
         {
-            // get current ip
             WebClient client1 = new WebClient();
             string eResult1 = client1.DownloadString("http://www.icanhazip.com").ToString();
             myIP = eResult1;
-            location temp1 = GetLocation(myIP);
-            myIPpt.latitude = temp1.latitude;
-            myIPpt.longitude = temp1.longitude;
-            //red
-            GMapOverlay Self = new GMapOverlay(gmap, "Self");
+            myIPpt.self = true;
+            myIPpt.localip = myIP;
+            myIPpt.UpdateLocation();
+            Self = new GMapOverlay(gmap, "Self");
             GMapMarker selfmark = new GMapMarkerGoogleRed(new PointLatLng(myIPpt.latitude, myIPpt.longitude));
             selfmark.ToolTipMode = MarkerTooltipMode.Always;
-            selfmark.ToolTipText = "Local";
+            selfmark.ToolTipText = "Local: " + myIP;
             Self.Markers.Add(selfmark);
             gmap.Overlays.Add(Self);
         }
         private void bstart_Click(object sender, EventArgs e)
         {
-            if (running == false)
-            {
-                running = true;
-                bstart.Text = StopMessage;
+        //    if (running == false)
+         //   {
+           //     running = true;
+            //    bstart.Text = StopMessage;
                 updatemyip();
                 Record();
-            }
-            else
-            {
-                running = false;
-                bstart.Text = StartMessage;
-            }
+          //  }
+          //  else
+         //   {
+          //      running = false;
+         //       bstart.Text = StartMessage;
+        //    }
         }
         private void configmap()
         {
@@ -89,18 +126,19 @@ namespace SessionMapper
         }
         private void ClearAll()
         {
-            rtb.Clear();
-            rtbUl.Clear();
-            rtbTl.Clear();
+            lv.Clear();
+            setuplv();
+            rrtb.Clear();
         }
         private void InvalidateAll()
         {
-            rtb.Invalidate();
-            rtbUl.Invalidate();
-            rtbTl.Invalidate();
+            lv.Invalidate();
+            gmap.Invalidate();
+            lv.Refresh();
         }
         private void Record()
         {
+            working();
             ClearAll();
             IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
             IPEndPoint[] endPointsTcp = ipProperties.GetActiveTcpListeners();
@@ -111,43 +149,63 @@ namespace SessionMapper
             //// ACTIVE CONNECTIONS
             //// ACTIVE CONNECTIONS
             //// ACTIVE CONNECTIONS
-            rtb.AppendText("== Active Connections ==" + nl);
-            string remoteip = "";
-            string localip = "";
-            string localport = "";
-            string remoteport = "";
-            string TcpState1 = "";
             location loc = new location();
             int tcplist = 0;
             int udplist = 0;
             int tcpconnlist = 0;
             int maplist = 0;
-            Boolean mapable = false;
-            point pt;
             string toolstr = "";
             string locbit = "";
+            int id = 0;
+            locs = new ArrayList();
+            ListViewItem itm;
+            int mapid = -1;
+            string[] arr;
             foreach (TcpConnectionInformation info in tcpConnections)
             {
-                localip = info.LocalEndPoint.Address.ToString();
-                localport = info.LocalEndPoint.Port.ToString();
-                remoteip = info.RemoteEndPoint.Address.ToString();
-                remoteport = info.RemoteEndPoint.Port.ToString();
-                TcpState1 = info.State.ToString();
-                loc = GetLocation(remoteip);
-                mapable = loc.success;
-                rtb.AppendText("* " + localip + ":" + localport + " => " + remoteip + ":" + remoteport + nl + "    " + TcpState1 + " (" + mapable + "," + loc.longitude + "," + loc.latitude + ")");
-                if (mapable)
+                mapid = -1;
+                id += 1;
+                loc = new location();
+                tcpconnlist += 1;
+                loc.id = id;
+                loc.localip = info.LocalEndPoint.Address.ToString();
+                loc.localport = info.LocalEndPoint.Port.ToString();
+                loc.remoteip = info.RemoteEndPoint.Address.ToString();
+                loc.remoteport = info.RemoteEndPoint.Port.ToString();
+                loc.localip = info.LocalEndPoint.Address.ToString();
+                loc.localport = info.LocalEndPoint.Port.ToString();
+                loc.tcpstate = info.State.ToString();
+                loc.islistener = false;
+                loc.isudp = false;
+                loc.UpdateLocation();
+                if (loc.success)
                 {
                     maplist += 1;
-                    pt = new point(loc.latitude, loc.longitude);
-                    mappoints.Add(pt);
+                    mapid = maplist;
+                    loc.mapid = mapid;
                     locbit = "(" + loc.city + ", " + loc.state + ", " + loc.country + ", " + loc.zip + ")";
-                    rtb.AppendText(" Point: " + maplist + locbit);
-                    toolstr = "Remote: " + maplist + locbit + nl + "(" + localip + ":" + localport + " => " + remoteip + ":" + remoteport + "  " + TcpState1 + ")";
+                    toolstr = "Remote: " + maplist + locbit + nl + " (" + loc.localip + ":" + loc.localport + " => " + loc.remoteip + ":" + loc.remoteport + "  " + loc.tcpstate + ")";
                     SetMarker(toolstr, loc.latitude, loc.longitude);
                 }
-                rtb.AppendText(nl);
-                tcpconnlist += 1;
+                locs.Add(loc);
+                InvalidateAll();
+                arr = new string[13];
+                arr[0] = Convert.ToString(id);
+                arr[1] = Convert.ToString(loc.localip);
+                arr[2] = Convert.ToString(loc.localport);
+                arr[3] = Convert.ToString(loc.remoteip);
+                arr[4] = Convert.ToString(loc.remoteport);
+                arr[5] = Convert.ToString(loc.tcpstate);
+                arr[6] = Convert.ToString("TCP");
+                arr[7] = Convert.ToString("Conn.");
+                //str for map id
+                if (mapid == -1) { arr[8] = Convert.ToString(""); } else { arr[8] = Convert.ToString(loc.mapid); }
+                arr[9] = Convert.ToString(loc.city);
+                arr[10] = Convert.ToString(loc.state);
+                arr[11] = Convert.ToString(loc.country);
+                arr[12] = Convert.ToString(loc.zip);
+                itm = new ListViewItem(arr);
+                lv.Items.Add(itm);
                 InvalidateAll();
             }
             //// TCP LISTENERS
@@ -155,56 +213,131 @@ namespace SessionMapper
             //// TCP LISTENERS
             string ip2 = "";
             string port2 = "";
-            rtbTl.AppendText("== TCP Listeners ==" + nl);
             foreach (IPEndPoint info in endPointsTcp)
             {
+                id += 1;
                 ip2 = info.Address.ToString();
                 if (ip2.Contains(":"))
                 { continue; }
                 port2 = info.Port.ToString();
-                rtbTl.AppendText(ip2 + ":" + port2 + nl);
+                loc = new location();
+                loc.localip = ip2;
+                loc.localport = port2;
+                loc.remoteip = "0.0.0.0";
+                loc.remoteport = "0";
+                loc.success = false;
+                loc.islistener = true;
+                loc.isudp = false;
+                locs.Add(loc);
                 tcplist += 1;
+                arr = new string[13];
+                arr[0] = Convert.ToString(id);
+                arr[1] = Convert.ToString(loc.localip);
+                arr[2] = Convert.ToString(loc.localport);
+                arr[3] = Convert.ToString(loc.remoteip);
+                arr[4] = Convert.ToString(loc.remoteport);
+                arr[5] = Convert.ToString(loc.tcpstate);
+                arr[6] = Convert.ToString("TCP");
+                arr[7] = Convert.ToString("Listener");
+                arr[8] = Convert.ToString(""); 
+                arr[9] = Convert.ToString(loc.city);
+                arr[10] = Convert.ToString(loc.state);
+                arr[11] = Convert.ToString(loc.country);
+                arr[12] = Convert.ToString(loc.zip);
+                itm = new ListViewItem(arr);
+                lv.Items.Add(itm);
+                InvalidateAll();
             }
             //// UDP LISTENERS
             //// UDP LISTENERS
             //// UDP LISTENERS
             string ip3 = "";
             string port3 = "";
-            rtbUl.AppendText("== UDP Listeners ==" + nl);
             foreach (IPEndPoint info in endPointsUdp)
             {
+                id += 1;
                 ip3 = info.Address.ToString();
                 if (ip3.Contains(":"))
                 { continue; }
                 port3 = info.Port.ToString();
-                rtbUl.AppendText(ip3 + ":" + port3 + nl);
+                loc = new location();
+                loc.localip = ip3;
+                loc.localport = port3;
+                loc.remoteip = "0.0.0.0";
+                loc.remoteport = "0";
+                loc.success = false;
+                loc.islistener = true;
+                loc.isudp = true;
+                locs.Add(loc);
                 udplist += 1;
+                arr = new string[13];
+                arr[0] = Convert.ToString(id);
+                arr[1] = Convert.ToString(loc.localip);
+                arr[2] = Convert.ToString(loc.localport);
+                arr[3] = Convert.ToString(loc.remoteip);
+                arr[4] = Convert.ToString(loc.remoteport);
+                arr[5] = Convert.ToString(loc.tcpstate);
+                arr[6] = Convert.ToString("UDP");
+                arr[7] = Convert.ToString("Listener");
+                arr[8] = Convert.ToString("");
+                arr[9] = Convert.ToString(loc.city);
+                arr[10] = Convert.ToString(loc.state);
+                arr[11] = Convert.ToString(loc.country);
+                arr[12] = Convert.ToString(loc.zip);
+                itm = new ListViewItem(arr);
+                lv.Items.Add(itm);
+                InvalidateAll();
             }
             lstats.Text = "TCP connections = " + tcpconnlist + " IPv4 || UDP listeners = " + udplist + " IPv4 / " + Ustats.UdpListeners.ToString() + " IPv4&&6 || TCP listeners = " + tcplist + " IPv4 / " + Tstats.CurrentConnections.ToString() + " IPv4&&6";
-            InvalidateAll();
-        }
-        private void bb_Click(object sender, EventArgs e)
-        {
-            rrtb.Clear();
-            string ip = tip.Text;
-            location tmp;
-            tmp = GetLocation(ip);
-            string strres = "(" + tmp.success + "," + tmp.latitude + "," + tmp.longitude + ")";
-            rrtb.AppendText(strres);
-            SetMarker("TEST", tmp.latitude, tmp.longitude);
+            lv.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            doneworking();
+            
         }
         public void SetMarker(string markertext, double lat1, double long1)
         {
             //green
-            GMapMarker myCity = new GMapMarkerGoogleGreen(new PointLatLng(lat1, long1));
-            myCity.ToolTipMode = MarkerTooltipMode.Always;
-            myCity.ToolTipText = markertext;
+            GMapMarker somecity = new GMapMarkerGoogleGreen(new PointLatLng(lat1, long1));
+            somecity.ToolTipMode = MarkerTooltipMode.Always;
+            somecity.ToolTipText = markertext;
             remotes = new GMapOverlay(gmap, "remotes");
-            remotes.Markers.Add(myCity);
+            remotes.Markers.Add(somecity);
             gmap.Overlays.Add(remotes);
             gmap.Refresh();
         }
-        public location GetLocation(string strIP)
+        public void SetMarkerCross(string markertext, double lat1, double long1)
+        {
+            //green
+            GMapMarker somecity = new GMapMarkerCross(new PointLatLng(lat1, long1));
+            somecity.ToolTipMode = MarkerTooltipMode.Always;
+            somecity.ToolTipText = markertext;
+            remotes = new GMapOverlay(gmap, "remotes");
+            remotes.Markers.Add(somecity);
+            gmap.Overlays.Add(remotes);
+            gmap.Refresh();
+        }
+        private void bb_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string locbit;
+                string strres;
+                string ip = tip.Text;
+                rrtb.Clear();
+                location tmp;
+                tmp = TESTGetLocation(ip);
+                locbit = "(" + tmp.city + ", " + tmp.state + ", " + tmp.country + ", " + tmp.zip + ")";
+                strres = "(" + tmp.success + "," + tmp.latitude + "," + tmp.longitude + ")";
+                rrtb.AppendText(strres);
+                SetMarkerCross("TEST Point, IP: " + tip.Text + nl + strres + nl + locbit, tmp.latitude, tmp.longitude);
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+          
+        }
+        public location TESTGetLocation(string strIP)
         {
             location temp1 = new location();
             try
@@ -231,40 +364,75 @@ namespace SessionMapper
             if (temp1.latitude == 0 && temp1.longitude == 0) { temp1.success = false; }
             return temp1;
         }
-        private void Form1_Shown(object sender, EventArgs e)
+
+        private void Form1_Shown(object sender, EventArgs e) 
         {
-            //configmap();
+            doneworking();
         }
-        private void Form1_Click(object sender, EventArgs e)
-        {
-        }
-        private void rtb_TextChanged(object sender, EventArgs e)
-        {
-        }
+        private void Form1_Click(object sender, EventArgs e) { }
+        private void rtb_TextChanged(object sender, EventArgs e) { }
         private void gmap_Load(object sender, EventArgs e)
         {
             configmap();
         }
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+
         }
+
+       
+
     }
     public class location
     {
-        public bool success = false;
+        public int id;
+        public bool success = false; //got stuff
+        public bool self = false;
+        public bool isudp = false;
+        public bool islistener = false;
+        public string localip = "";
+        public string remoteip = "";
+        public string localport = "";
+        public string remoteport = "";
+        public string state = "";
         public double latitude = 0;
         public double longitude = 0;
-        public string city;
-        public string country;
-        public string state;
-        public string zip;
+        public string city = "";
+        public string country = "";
+        public string tcpstate = "";
+        public string zip = "";
+        public int mapid = -1;
+
+        public void UpdateLocation()
+        {
+            try
+            {
+                string ipip;
+                if (self == false) { ipip = this.remoteip; } else { ipip = this.localip; }
+                string apikey = "a375f9c927c2ffa58c56e47cb6d9890eaefa74412271fbd72e1f7fcb3fb8b549"; // had to sign up for free account to get this api key
+                string path = "http://api.ipinfodb.com/v3/ip-city/?key=" + apikey + "&ip=" + ipip;
+                WebClient client = new WebClient();
+                string eResult = client.DownloadString(path).ToString();
+                char delimiter = ';';
+                string[] splits = eResult.Split(delimiter);
+                this.success = true;
+                this.city = Convert.ToString(splits[6]);
+                this.state = Convert.ToString(splits[5]);
+                this.zip = Convert.ToString(splits[7]);
+                this.country = Convert.ToString(splits[4]);
+                this.latitude = Convert.ToDouble(splits[8]);
+                this.longitude = Convert.ToDouble(splits[9]);
+            }
+            catch
+            {
+                this.success = false;
+
+            }
+            if (this.latitude == 0 && this.longitude == 0) { this.success = false; }
+
+        }
     }
-    public class point
-    {
-        public double latitude = 0;
-        public double longitude = 0;
-        public point(double latitudenum, double longitudenum) { latitude = latitudenum; longitude = longitudenum; }
-    }
-}
+ }
 
 
