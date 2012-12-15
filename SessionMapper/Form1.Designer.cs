@@ -35,6 +35,8 @@
             this.tip = new System.Windows.Forms.TextBox();
             this.gmap = new GMap.NET.WindowsForms.GMapControl();
             this.lv = new System.Windows.Forms.ListView();
+            this.rtb = new System.Windows.Forms.RichTextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // bstart
@@ -68,7 +70,7 @@
             // 
             // rrtb
             // 
-            this.rrtb.Location = new System.Drawing.Point(499, 10);
+            this.rrtb.Location = new System.Drawing.Point(499, 9);
             this.rrtb.Name = "rrtb";
             this.rrtb.Size = new System.Drawing.Size(216, 21);
             this.rrtb.TabIndex = 4;
@@ -88,7 +90,7 @@
             this.gmap.CanDragMap = true;
             this.gmap.GrayScaleMode = false;
             this.gmap.LevelsKeepInMemmory = 5;
-            this.gmap.Location = new System.Drawing.Point(721, 14);
+            this.gmap.Location = new System.Drawing.Point(721, 7);
             this.gmap.MarkersEnabled = true;
             this.gmap.MaxZoom = 2;
             this.gmap.MinZoom = 2;
@@ -112,11 +114,31 @@
             this.lv.TabIndex = 8;
             this.lv.UseCompatibleStateImageBehavior = false;
             // 
+            // rtb
+            // 
+            this.rtb.Location = new System.Drawing.Point(12, 690);
+            this.rtb.Name = "rtb";
+            this.rtb.Size = new System.Drawing.Size(1534, 195);
+            this.rtb.TabIndex = 9;
+            this.rtb.Text = "";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(1552, 690);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 195);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1648, 699);
+            this.ClientSize = new System.Drawing.Size(1648, 897);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.rtb);
             this.Controls.Add(this.lv);
             this.Controls.Add(this.gmap);
             this.Controls.Add(this.tip);
@@ -145,6 +167,8 @@
         private System.Windows.Forms.TextBox tip;
         private GMap.NET.WindowsForms.GMapControl gmap;
         private System.Windows.Forms.ListView lv;
+        public System.Windows.Forms.RichTextBox rtb;
+        private System.Windows.Forms.Button button1;
     }
 }
 
